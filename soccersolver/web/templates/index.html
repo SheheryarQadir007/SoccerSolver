@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SoccerSolver | Algorithm/Solution Agent Creator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    .code-box { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50 px-6 py-3 flex items-center justify-between">
+    <div class="flex items-center space-x-4">
+      <div class="flex items-center space-x-2">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center font-black text-slate-950 text-xl shadow-lg shadow-emerald-500/20">
+          ⚽
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-bold text-lg tracking-tight bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">SoccerSolver</span>
+            <span class="badge badge-sm badge-outline text-emerald-400 border-emerald-500/40 text-[10px] font-semibold">xTV Core</span>
+          </div>
+          <span class="text-[11px] text-slate-400">Decision-Making Agent Engine</span>
+        </div>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-1 pl-6 border-l border-slate-800 text-xs">
+        <span class="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 font-medium">SoccerSolver</span>
+        <span class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer">AgentSolver</span>
+        <span class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer">MediaSolver</span>
+        <span class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer">BrandSolver</span>
+        <span class="px-2.5 py-1 rounded-md text-slate-400 hover:text-slate-200 cursor-pointer">xV</span>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-3 text-xs">
+      <div class="badge badge-success badge-sm gap-1 bg-emerald-500/20 text-emerald-300 border-none font-medium">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        MIT Sloan SAC '26 Finalist
+      </div>
+      <div class="badge badge-neutral badge-sm gap-1 border-slate-700 text-slate-300 font-mono" id="dbStatusBadge">
+        35,996 Real Players
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Tabs -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+    <!-- Tab Buttons -->
+    <div class="flex flex-wrap border-b border-slate-800 gap-2 pb-2">
+      <button onclick="switchTab('solver')" id="tab-solver-btn" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-500 text-slate-950 flex items-center gap-2 shadow-lg shadow-emerald-500/10">
+        <i class="fa-solid fa-bullseye"></i> 1. Mathematical Decision Solver
+      </button>
+      <button onclick="switchTab('backtest')" id="tab-backtest-btn" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-chart-line"></i> 2. Historical Backtest Lab
+      </button>
+      <button onclick="switchTab('hitl')" id="tab-hitl-btn" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-bolt"></i> 3. Proactive Triggers & HITL Queue
+        <span id="pendingActionCount" class="badge badge-xs badge-warning ml-1">0</span>
+      </button>
+      <button onclick="switchTab('observability')" id="tab-observability-btn" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-magnifying-glass-chart"></i> 4. Observability & Cost
+      </button>
+      <button onclick="switchTab('data')" id="tab-data-btn" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-slate-900 text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-database"></i> 5. Verified Data Citations
+      </button>
+    </div>
+
+    <!-- TAB 1: MATHEMATICAL DECISION SOLVER -->
+    <section id="tab-solver" class="space-y-6">
+      
+      <!-- Query Panel -->
+      <div class="bg-slate-900/70 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-3xl space-y-4">
+          <div>
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+              <span>Recruitment Problem Formulation</span>
+              <span class="text-xs font-normal px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Decision Process, Not Chatbot</span>
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">
+              Describe your squad recruitment constraint in natural language. The agent formalizes variables, solves via Mixed-Integer TOPSIS, runs sensitivity analysis, and stages verifiable actions.
+            </p>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+              <input id="queryInput" type="text"
+                value="we need a left back under 3M€ who fits LaLiga"
+                placeholder="e.g. we need a left back under 3M€ who fits LaLiga, age under 26"
+                class="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-white placeholder-slate-500"
+              />
+            </div>
+            <button onclick="executeSolve()" id="solveBtn" class="btn btn-primary bg-emerald-500 hover:bg-emerald-400 text-slate-950 border-none font-bold px-6 shadow-lg shadow-emerald-500/20">
+              <i class="fa-solid fa-calculator"></i> Solve Problem
+            </button>
+          </div>
+
+          <!-- Prompt Preset Chips -->
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-slate-500 font-medium">Quick Scenarios:</span>
+            <button onclick="setQuery('we need a left back under 3M€ who fits LaLiga')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              ⭐ Left-Back &lt; 3M€ (LaLiga)
+            </button>
+            <button onclick="setQuery('striker under 20M for Premier League')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              ⚽ Striker &lt; 20M€ (Premier League)
+            </button>
+            <button onclick="setQuery('replacement for Pedri under 15M')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              🪄 Replacement for Pedri &lt; 15M€
+            </button>
+            <button onclick="setQuery('centre back under 10M in Serie A')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              🛡️ Centre-Back &lt; 10M€ (Serie A)
+            </button>
+            <button onclick="setQuery('winger under 30M for Bundesliga')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              ⚡ Winger &lt; 30M€ (Bundesliga)
+            </button>
+            <button onclick="setQuery('player like Bellingham under 50M for Premier League')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              🎯 Like Bellingham &lt; 50M€
+            </button>
+            <button onclick="setQuery('young defensive midfielder under 8M for LaLiga')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              💎 U-23 CDM &lt; 8M€
+            </button>
+            <button onclick="setQuery('goalkeeper under 5M for Ligue 1')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/60 transition">
+              🧤 Goalkeeper &lt; 5M€
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Formalization LaTeX & Mathematical Spec -->
+      <div id="formalizationSection" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-4">
+        
+        <!-- LaTeX Display Card -->
+        <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-square-root-variable text-emerald-400"></i>
+              <h3 class="font-bold text-sm text-slate-200">Formal Mathematical Program</h3>
+            </div>
+            <span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Objective: TOPSIS Closeness Maximization</span>
+          </div>
+          <div id="latexContainer" class="bg-slate-950 p-5 rounded-xl overflow-x-auto text-sm text-slate-200 py-4 block text-left"></div>
+          <div id="constraintsTags" class="flex flex-wrap gap-2 text-xs pt-2"></div>
+        </div>
+
+        <!-- Sensitivity & Shadow Price Card -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-3 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-sliders text-amber-400"></i>
+                <h3 class="font-bold text-sm text-slate-200">Sensitivity & Slack Analysis</h3>
+              </div>
+              <span class="text-[11px] text-slate-400 font-mono" id="solverLatencyBadge">114 ms</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mt-3 text-center">
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="text-[11px] text-slate-400">Budget Slack</div>
+                <div id="slackBudgetDisplay" class="text-lg font-bold text-emerald-400 font-mono">€2,000,000</div>
+              </div>
+              <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                <div class="text-[11px] text-slate-400">Shadow Price (+15%)</div>
+                <div id="shadowPriceDisplay" class="text-lg font-bold text-amber-400 font-mono">+6.9%</div>
+              </div>
+            </div>
+
+            <div class="mt-3 text-xs text-slate-300 bg-slate-950/80 p-3 rounded-xl border border-slate-800" id="sensitivityNotes">
+              Analyzing elasticity...
+            </div>
+          </div>
+
+          <div class="text-[11px] text-slate-500 pt-2 border-t border-slate-800">
+            Binding Constraints: <span id="bindingConstraintsCount" class="font-semibold text-slate-300">2 active</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Candidate Ranking Table -->
+      <div id="candidatesSection" class="hidden bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
+        <div class="p-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60">
+          <div>
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i class="fa-solid fa-list-ol text-emerald-400"></i>
+              <span>Optimal Candidate Ranking (Verified Real Data)</span>
+            </h3>
+            <p class="text-xs text-slate-400">Strictly zero mock data. Every candidate backed by verified Transfermarkt profile URL and appearance records.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs text-slate-400">Model Confidence:</span>
+            <div class="radial-progress text-emerald-400 text-xs font-bold" id="modelConfidenceCircle" style="--value:92; --size:2.2rem; --thickness: 3px;" role="progressbar">92%</div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="table table-sm w-full text-left">
+            <thead class="bg-slate-950 text-slate-400 text-xs font-semibold uppercase tracking-wider">
+              <tr>
+                <th>Rank</th>
+                <th>Player & Club</th>
+                <th>Age</th>
+                <th>Market Value</th>
+                <th>Tactical Fit</th>
+                <th>xGrowth (xTV)</th>
+                <th>Efficiency</th>
+                <th>Composite Score</th>
+                <th>Confidence</th>
+                <th>Citation Source</th>
+              </tr>
+            </thead>
+            <tbody id="candidatesTableBody" class="divide-y divide-slate-800/60 text-xs">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Candidate Table Pagination Controls -->
+        <div class="p-3 border-t border-slate-800 bg-slate-950/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="text-slate-400">
+            <span id="candidateCountInfo">Showing 1-10 of candidates</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-500">Per page:</span>
+            <select id="candidatePageSize" onchange="changeCandidatePageSize(this.value)" class="select select-xs select-bordered bg-slate-900 border-slate-700 text-slate-300">
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50 (All)</option>
+            </select>
+            <div class="join">
+              <button onclick="prevCandidatePage()" id="prevCandidateBtn" class="join-item btn btn-xs btn-outline border-slate-700 text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+              </button>
+              <button id="candidatePageIndicator" class="join-item btn btn-xs btn-neutral border-slate-700 text-slate-300 pointer-events-none">
+                Page 1
+              </button>
+              <button onclick="nextCandidatePage()" id="nextCandidateBtn" class="join-item btn btn-xs btn-outline border-slate-700 text-slate-300 hover:bg-slate-800">
+                Next <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: HISTORICAL BACKTEST LAB -->
+    <section id="tab-backtest" class="hidden space-y-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-teal-400"></i>
+              <span>Historical Backtesting Engine</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Blind simulation: evaluates algorithm recommendations on past seasons (July 1st snapshot) and measures ground-truth forward realized valuation appreciation across subsequent years.
+            </p>
+          </div>
+          
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="backtestSeasonSelect" class="select select-sm select-bordered bg-slate-950 border-slate-700 text-xs">
+              <option value="2022/2023" selected>Season 2022/2023</option>
+              <option value="2021/2022">Season 2021/2022</option>
+              <option value="2023/2024">Season 2023/2024</option>
+            </select>
+            <select id="backtestPositionSelect" class="select select-sm select-bordered bg-slate-950 border-slate-700 text-xs">
+              <option value="Left-Back" selected>Left-Back</option>
+              <option value="Centre-Forward">Centre-Forward (Striker)</option>
+              <option value="Central Midfield">Central Midfield</option>
+              <option value="Centre-Back">Centre-Back</option>
+              <option value="Right-Back">Right-Back</option>
+              <option value="Left Winger">Left Winger</option>
+              <option value="Right Winger">Right Winger</option>
+              <option value="Defensive Midfield">Defensive Midfield</option>
+              <option value="Attacking Midfield">Attacking Midfield</option>
+              <option value="Goalkeeper">Goalkeeper</option>
+            </select>
+            <div class="flex items-center bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs">
+              <span class="text-slate-500 mr-1 font-mono">Max €</span>
+              <input id="backtestBudgetInput" type="number" value="10000000" step="1000000" class="bg-transparent text-white w-24 focus:outline-none font-mono text-xs" title="Budget limit" />
+            </div>
+            <select id="backtestLimitSelect" class="select select-sm select-bordered bg-slate-950 border-slate-700 text-xs text-slate-300">
+              <option value="5">Top 5</option>
+              <option value="10" selected>Top 10</option>
+              <option value="15">Top 15</option>
+              <option value="25">Top 25</option>
+            </select>
+            <button onclick="executeBacktest()" id="runBacktestBtn" class="btn btn-sm btn-primary bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold border-none shadow-lg shadow-teal-500/20">
+              <i class="fa-solid fa-play"></i> Run Historical Backtest
+            </button>
+          </div>
+        </div>
+
+        <!-- Backtest KPI Cards -->
+        <div id="backtestKpis" class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">Hit Rate %</div>
+            <div id="btHitRate" class="text-2xl font-black text-emerald-400 mt-1">100.0%</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Value appreciated</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">Avg Growth %</div>
+            <div id="btAvgGrowth" class="text-2xl font-black text-teal-300 mt-1">+2,075%</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Mean appreciation</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">Unrealized Gain</div>
+            <div id="btProfit" class="text-2xl font-black text-emerald-300 mt-1">€10.38M</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Total capital created</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">ROI Multiple</div>
+            <div id="btRoi" class="text-2xl font-black text-amber-400 mt-1">47.1x</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Exit / Entry ratio</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center col-span-2 md:col-span-1">
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">Sharpe Proxy</div>
+            <div id="btSharpe" class="text-2xl font-black text-sky-400 mt-1">1.25</div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Risk-adjusted ratio</div>
+          </div>
+        </div>
+
+        <!-- Benchmark Note -->
+        <div id="btBenchmarkNote" class="text-xs bg-slate-950/80 border border-slate-800 p-4 rounded-xl text-slate-300 leading-relaxed">
+          Loading benchmark results...
+        </div>
+
+        <!-- Realized Outturn Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="table table-sm w-full">
+            <thead class="bg-slate-950 text-slate-400 text-xs uppercase">
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Historical Entry Val</th>
+                <th>Forward Realized Val</th>
+                <th>Realized Gain (%)</th>
+                <th>Verdict & Outcome</th>
+                <th>Verified Profile</th>
+              </tr>
+            </thead>
+            <tbody id="backtestTableBody" class="divide-y divide-slate-800/60 text-xs">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 3: PROACTIVE EVENTS & HITL QUEUE -->
+    <section id="tab-hitl" class="hidden space-y-6">
+      
+      <!-- Event Trigger Simulator -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400"></i>
+            <span>Real Proactivity: Football Event Bus</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            The agent acts proactively without user prompt: listens for match events, injuries, contract deadlines, and valuation dislocations to stage high-leverage actions.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- Injury Trigger Card -->
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-red-400 flex items-center gap-2">
+                <i class="fa-solid fa-kit-medical"></i> Emergency Injury Event
+              </span>
+              <span class="badge badge-xs badge-error">Automated Event</span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Simulates starter Diego Rico (LB, Getafe CF) tearing ACL (6 months layoff). Agent autonomously executes solver and stages an emergency scout dispatch in the approval queue.
+            </p>
+            <button onclick="triggerInjuryEvent()" id="injuryBtn" class="btn btn-sm btn-error bg-red-600 hover:bg-red-500 text-white font-bold w-full border-none">
+              <i class="fa-solid fa-bolt"></i> Fire Injury Event (Getafe CF LB)
+            </button>
+          </div>
+
+          <!-- Contract Expiry Trigger Card -->
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-file-contract"></i> Contract Expiry Leverage Scan
+              </span>
+              <span class="badge badge-xs badge-warning">Periodic Scanner</span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Scans database for high-potential players entering their final 6-12 months of contract with low buyout exposure to stage agent inquiries.
+            </p>
+            <button onclick="triggerExpiryScan()" id="expiryBtn" class="btn btn-sm btn-warning bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold w-full border-none">
+              <i class="fa-solid fa-radar"></i> Run Autonomous Expiry Scan
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Human-in-the-Loop Action Approval Queue -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-bold text-base text-white flex items-center gap-2">
+              <i class="fa-solid fa-user-check text-emerald-400"></i>
+              <span>Human-in-the-Loop (HITL) Action Queue</span>
+            </h3>
+            <p class="text-xs text-slate-400">Strict Safety Rule: Irreversible actions (outreach, inquiries, offers) are blocked until approved by the Sporting Director.</p>
+          </div>
+          <button onclick="loadHitlActions()" class="btn btn-xs btn-outline border-slate-700 text-slate-300">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh
+          </button>
+        </div>
+
+        <div id="hitlActionsList" class="space-y-3">
+          <div class="text-center py-8 text-slate-500 text-xs">Loading queue...</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 4: OBSERVABILITY & COST TRACKER -->
+    <section id="tab-observability" class="hidden space-y-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-gauge-high text-sky-400"></i>
+            <span>Observability & Cost Intelligence</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Complete audit trail of every agent decision, tool execution, token consumption, and dollar cost per run.
+          </p>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase">Total Runs</div>
+            <div id="obsTotalRuns" class="text-2xl font-black text-white mt-1">0</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase">Prompt Tokens</div>
+            <div id="obsPromptTokens" class="text-2xl font-black text-sky-400 mt-1">0</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase">Total Cost (USD)</div>
+            <div id="obsTotalCost" class="text-2xl font-black text-emerald-400 mt-1">$0.0000</div>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+            <div class="text-[11px] text-slate-400 uppercase">Avg Latency</div>
+            <div id="obsAvgLatency" class="text-2xl font-black text-amber-400 mt-1">0 ms</div>
+          </div>
+        </div>
+
+        <!-- Traces Table -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="table table-sm w-full">
+            <thead class="bg-slate-950 text-slate-400 text-xs uppercase">
+              <tr>
+                <th>Run ID</th>
+                <th>Timestamp</th>
+                <th>Trigger</th>
+                <th>Query / Event</th>
+                <th>Latency</th>
+                <th>Cost ($)</th>
+                <th>Status</th>
+                <th>Tool Cascade</th>
+              </tr>
+            </thead>
+            <tbody id="obsTableBody" class="divide-y divide-slate-800/60 text-xs">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 5: DATA CITATIONS & VERIFICATION -->
+    <section id="tab-data" class="hidden space-y-6">
+      
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-certificate text-emerald-400"></i>
+            <span>Verified Public Football Data & Source Provenance</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">
+            Every candidate, appearance, valuation, and transfer is grounded in real historical football records with full citations and direct profile links.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="font-bold text-sm text-emerald-400">Primary Database Source</div>
+            <p class="text-xs text-slate-300">
+              Transfermarkt Open Dataset (dcaribou/transfermarkt-datasets, Open Database License ODbL). Covers 50,000+ players, 1.8M appearances, 440k valuations, and 175k transfers across 65 official competitions.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono">
+              Database: soccersolver/data/soccersolver.db
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="font-bold text-sm text-teal-400">Tactical Profiles & Style Fit</div>
+            <p class="text-xs text-slate-300">
+              Aggregated match appearances per season, minutes played, goals/assists per 90, yellow/red card discipline, and physical profiles mapped to LaLiga adaptation coefficients.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono">
+              Table: tactical_profiles & player_seasons
+            </div>
+          </div>
+
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <div class="font-bold text-sm text-amber-400">Data Disagreements & Rigor</div>
+            <p class="text-xs text-slate-300">
+              The agent explicitly flags discrepancies between crowdsourced Transfermarkt market valuations vs real transfer fees paid, contract rundowns, and post-injury valuation lags.
+            </p>
+            <div class="text-[11px] text-slate-500 font-mono">
+              Field: data_disagreement_notes
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Counts -->
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="table table-sm w-full">
+            <thead class="bg-slate-950 text-slate-400 text-xs uppercase">
+              <tr>
+                <th>Table Entity</th>
+                <th>Total Real Records</th>
+                <th>License & Citation</th>
+                <th>Coverage Scope</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/60 text-xs">
+              <tr>
+                <td class="font-bold text-white">players</td>
+                <td class="font-mono text-emerald-400">35,996</td>
+                <td>Transfermarkt (ODbL)</td>
+                <td>Active seasons 2020-2026 across 65 leagues</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-white">player_valuations</td>
+                <td class="font-mono text-emerald-400">441,492</td>
+                <td>Transfermarkt (ODbL)</td>
+                <td>Full historical valuation trajectories per player</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-white">player_seasons</td>
+                <td class="font-mono text-emerald-400">149,246</td>
+                <td>Transfermarkt Match Appearances (ODbL)</td>
+                <td>Minutes, appearances, goals, assists per 90</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-white">transfers</td>
+                <td class="font-mono text-emerald-400">175,165</td>
+                <td>Transfermarkt Real Transfers (ODbL)</td>
+                <td>Real club-to-club fees, dates, and contracts</td>
+              </tr>
+              <tr>
+                <td class="font-bold text-white">competitions</td>
+                <td class="font-mono text-emerald-400">65</td>
+                <td>Transfermarkt (ODbL)</td>
+                <td>Top-5 European Leagues + Feeder & Global leagues</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Live Player Database Explorer -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="font-bold text-base text-white flex items-center gap-2">
+                <i class="fa-solid fa-users-viewfinder text-teal-400"></i>
+                <span>Live Football Database Explorer (35,996 Active Players)</span>
+              </h3>
+              <p class="text-xs text-slate-400">Search and explore verified real player records across 65 official competitions with direct Transfermarkt citations.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="relative">
+                <input type="text" id="playerSearchInput" placeholder="Search by player or club (e.g. Pedri, Yamal)..." class="input input-sm input-bordered bg-slate-950 border-slate-700 text-xs w-64 text-white pl-8" onkeyup="if(event.key==='Enter') searchPlayers(1)">
+                <i class="fa-solid fa-search absolute left-2.5 top-2.5 text-slate-500 text-xs"></i>
+              </div>
+              <select id="playerPositionFilter" class="select select-sm select-bordered bg-slate-950 border-slate-700 text-xs" onchange="searchPlayers(1)">
+                <option value="ALL" selected>All Positions</option>
+                <option value="Attack">Attackers</option>
+                <option value="Midfield">Midfielders</option>
+                <option value="Defender">Defenders</option>
+                <option value="Goalkeeper">Goalkeepers</option>
+              </select>
+              <button onclick="searchPlayers(1)" class="btn btn-sm btn-primary bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold border-none">
+                <i class="fa-solid fa-filter"></i> Search
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-800">
+            <table class="table table-sm w-full text-left">
+              <thead class="bg-slate-950 text-slate-400 text-xs uppercase">
+                <tr>
+                  <th>Player</th>
+                  <th>Age</th>
+                  <th>Club</th>
+                  <th>League</th>
+                  <th>Position</th>
+                  <th>Current Valuation</th>
+                  <th>Peak Valuation</th>
+                  <th>Contract Expiry</th>
+                  <th>Citation</th>
+                </tr>
+              </thead>
+              <tbody id="playerExplorerTableBody" class="divide-y divide-slate-800/60 text-xs">
+                <!-- Dynamically loaded -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Explorer Pagination Controls -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs pt-2">
+            <div class="text-slate-400" id="explorerCountInfo">
+              Showing players...
+            </div>
+            <div class="join">
+              <button onclick="prevExplorerPage()" id="prevExplorerBtn" class="join-item btn btn-xs btn-outline border-slate-700 text-slate-300 hover:bg-slate-800">
+                <i class="fa-solid fa-chevron-left"></i> Prev
+              </button>
+              <button id="explorerPageIndicator" class="join-item btn btn-xs btn-neutral border-slate-700 text-slate-300 pointer-events-none">
+                Page 1
+              </button>
+              <button onclick="nextExplorerPage()" id="nextExplorerBtn" class="join-item btn btn-xs btn-outline border-slate-700 text-slate-300 hover:bg-slate-800">
+                Next <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 bg-slate-950 px-6 py-4 text-center text-xs text-slate-500">
+    SoccerSolver Decision Engine &bull; Quantitative Transfer Market & Scouting Optimizer &bull; Real-time Multi-Criteria Optimization
+  </footer>
+
+  <!-- Application Logic Scripts -->
+  <script>
+    let allCandidates = [];
+    let candidatePage = 1;
+    let candidatePageSize = 10;
+
+    function switchTab(tabId) {
+      ['solver', 'backtest', 'hitl', 'observability', 'data'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}-btn`);
+        btn.classList.remove('bg-emerald-500', 'text-slate-950');
+        btn.classList.add('bg-slate-900', 'text-slate-400');
+      });
+
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}-btn`);
+      activeBtn.classList.remove('bg-slate-900', 'text-slate-400');
+      activeBtn.classList.add('bg-emerald-500', 'text-slate-950');
+
+      if (tabId === 'hitl') loadHitlActions();
+      if (tabId === 'observability') loadObservability();
+      if (tabId === 'data') searchPlayers(1);
+    }
+
+    function setQuery(text) {
+      document.getElementById('queryInput').value = text;
+      executeSolve();
+    }
+
+    function renderCandidatesPage() {
+      const tbody = document.getElementById('candidatesTableBody');
+      const start = (candidatePage - 1) * candidatePageSize;
+      const end = start + candidatePageSize;
+      const pageSlice = allCandidates.slice(start, end);
+      const totalPages = Math.max(1, Math.ceil(allCandidates.length / candidatePageSize));
+
+      const countInfo = document.getElementById('candidateCountInfo');
+      if (countInfo) {
+        countInfo.innerText = allCandidates.length 
+          ? `Showing ${start + 1}-${Math.min(end, allCandidates.length)} of ${allCandidates.length} optimal candidates` 
+          : 'No candidates found';
+      }
+      const pageInd = document.getElementById('candidatePageIndicator');
+      if (pageInd) pageInd.innerText = `Page ${candidatePage} of ${totalPages}`;
+      const prevBtn = document.getElementById('prevCandidateBtn');
+      if (prevBtn) prevBtn.disabled = (candidatePage <= 1);
+      const nextBtn = document.getElementById('nextCandidateBtn');
+      if (nextBtn) nextBtn.disabled = (candidatePage >= totalPages);
+
+      tbody.innerHTML = pageSlice.map(c => `
+        <tr class="hover:bg-slate-800/40 transition">
+          <td class="font-bold text-emerald-400">#${c.rank}</td>
+          <td>
+            <div class="font-bold text-white text-sm flex items-center gap-1.5">
+              <span>${c.name}</span>
+              ${c.similarity_to_reference ? `<span class="badge badge-xs badge-info text-[10px] font-mono">${c.similarity_to_reference}% Sim</span>` : ''}
+            </div>
+            <div class="text-[11px] text-slate-400">${c.current_club_name} (${c.current_league_code}) &bull; ${c.sub_position}</div>
+          </td>
+          <td>${c.age}y</td>
+          <td class="font-mono text-slate-200">€${Number(c.market_value_eur).toLocaleString()}</td>
+          <td>
+            <div class="font-semibold text-emerald-300">${c.tactical_fit_score}</div>
+            <div class="text-[10px] text-slate-500">x${c.league_adaptation_factor} adapt</div>
+          </td>
+          <td class="font-semibold text-teal-300">${c.xtv_growth_score}</td>
+          <td class="font-semibold text-amber-300">${c.value_efficiency_score}</td>
+          <td>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-bold text-xs bg-emerald-400 text-slate-950 font-mono shadow-sm">${c.composite_score}</span>
+          </td>
+          <td>
+            <span class="text-xs font-mono text-slate-300">${Math.round(c.confidence_level * 100)}%</span>
+          </td>
+          <td>
+            <a href="${c.data_citation_url}" target="_blank" class="text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1">
+              <span>Transfermarkt</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+            </a>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function prevCandidatePage() {
+      if (candidatePage > 1) {
+        candidatePage--;
+        renderCandidatesPage();
+      }
+    }
+
+    function nextCandidatePage() {
+      const totalPages = Math.ceil(allCandidates.length / candidatePageSize);
+      if (candidatePage < totalPages) {
+        candidatePage++;
+        renderCandidatesPage();
+      }
+    }
+
+    function changeCandidatePageSize(size) {
+      candidatePageSize = parseInt(size);
+      candidatePage = 1;
+      renderCandidatesPage();
+    }
+
+    async function executeSolve() {
+      const q = document.getElementById('queryInput').value.trim();
+      if (!q) return;
+
+      const btn = document.getElementById('solveBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Solving...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/solve', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ query: q, auto_stage_hitl: true })
+        });
+        const data = await resp.json();
+
+        // 1. Render LaTeX
+        document.getElementById('formalizationSection').classList.remove('hidden');
+        const latexEl = document.getElementById('latexContainer');
+        katex.render(data.formalized_spec.mathematical_formulation_latex, latexEl, { displayMode: true, throwOnError: false });
+
+        // 2. Render Constraints
+        const tagsEl = document.getElementById('constraintsTags');
+        tagsEl.innerHTML = data.formalized_spec.constraints.map(c => 
+          `<span class="badge badge-sm badge-neutral border-slate-700 text-slate-300 font-mono">${c.variable} ${c.operator} ${c.value}</span>`
+        ).join('');
+
+        // 3. Render Sensitivity
+        document.getElementById('solverLatencyBadge').innerText = `${data.solution.execution_time_ms} ms`;
+        document.getElementById('slackBudgetDisplay').innerText = `€${Number(data.solution.sensitivity.slack_budget_eur).toLocaleString()}`;
+        document.getElementById('shadowPriceDisplay').innerText = `+${data.solution.sensitivity.budget_shadow_price_pct}%`;
+        document.getElementById('sensitivityNotes').innerText = data.solution.sensitivity.tradeoff_notes;
+        document.getElementById('bindingConstraintsCount').innerText = `${data.solution.sensitivity.binding_constraints.length} active`;
+
+        // 4. Render Table with Pagination
+        document.getElementById('candidatesSection').classList.remove('hidden');
+        allCandidates = data.solution.candidates || [];
+        candidatePage = 1;
+        renderCandidatesPage();
+
+        // Update confidence circle
+        const confPct = Math.round(data.solution.model_confidence_score * 100);
+        const circle = document.getElementById('modelConfidenceCircle');
+        circle.style.setProperty('--value', confPct);
+        circle.innerText = `${confPct}%`;
+
+        loadPendingCount();
+
+      } catch (err) {
+        alert("Error executing solver: " + err);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-calculator"></i> Solve Problem';
+        btn.disabled = false;
+      }
+    }
+
+    async function executeBacktest() {
+      const season = document.getElementById('backtestSeasonSelect').value;
+      const position = document.getElementById('backtestPositionSelect').value;
+      const budget = parseFloat(document.getElementById('backtestBudgetInput').value) || 10000000.0;
+      const btn = document.getElementById('runBacktestBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Running...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/backtest', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            historical_season: season,
+            position: position,
+            budget: budget,
+            top_k: parseInt(document.getElementById('backtestLimitSelect')?.value || 10)
+          })
+        });
+        const data = await resp.json();
+
+        document.getElementById('btHitRate').innerText = `${data.portfolio_hit_rate_pct}%`;
+        document.getElementById('btAvgGrowth').innerText = `+${data.average_value_appreciation_pct}%`;
+        document.getElementById('btProfit').innerText = `€${(data.total_unrealized_profit_eur / 1e6).toFixed(2)}M`;
+        document.getElementById('btRoi').innerText = `${data.roi_multiple}x`;
+        document.getElementById('btSharpe').innerText = data.sharpe_proxy_ratio;
+        document.getElementById('btBenchmarkNote').innerText = data.benchmark_note;
+
+        const tbody = document.getElementById('backtestTableBody');
+        tbody.innerHTML = data.top_recommendations.map(r => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="font-bold text-teal-400">#${r.rank}</td>
+            <td class="font-bold text-white">${r.name}</td>
+            <td class="font-mono text-slate-300">€${Number(r.entry_market_value_eur).toLocaleString()}</td>
+            <td class="font-mono text-emerald-400 font-bold">€${Number(r.forward_market_value_eur).toLocaleString()}</td>
+            <td class="font-mono font-bold ${r.percentage_growth >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+              ${r.percentage_growth >= 0 ? '+' : ''}${r.percentage_growth.toFixed(1)}%
+            </td>
+            <td>
+              ${(() => {
+                let badgeStyle = '';
+                let icon = '';
+                if (r.percentage_growth >= 50) {
+                  badgeStyle = 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 shadow-sm shadow-emerald-500/10';
+                  icon = '<i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>';
+                } else if (r.percentage_growth > 0) {
+                  badgeStyle = 'bg-sky-950/80 text-sky-300 border-sky-500/40 shadow-sm shadow-sky-500/10';
+                  icon = '<i class="fa-solid fa-arrow-up-right-dots text-sky-400"></i>';
+                } else if (r.percentage_growth === 0) {
+                  badgeStyle = 'bg-slate-900 text-slate-300 border-slate-700';
+                  icon = '<i class="fa-solid fa-minus text-slate-400"></i>';
+                } else {
+                  badgeStyle = 'bg-rose-950/80 text-rose-300 border-rose-500/40 shadow-sm shadow-rose-500/10';
+                  icon = '<i class="fa-solid fa-arrow-trend-down text-rose-400"></i>';
+                }
+                return `
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${badgeStyle}">
+                    ${icon}
+                    <span>${r.verdict}</span>
+                  </span>
+                `;
+              })()}
+            </td>
+            <td>
+              <a href="${r.historical_profile_url}" target="_blank" class="text-teal-400 underline flex items-center gap-1">
+                <span>View TM</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+              </a>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        alert("Backtest error: " + err);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-play"></i> Run Historical Backtest';
+        btn.disabled = false;
+      }
+    }
+
+    async function triggerInjuryEvent() {
+      const btn = document.getElementById('injuryBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Triggering...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/proactive/trigger-injury', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            club_name: 'Getafe CF',
+            injured_player_name: 'Diego Rico',
+            position: 'Left-Back',
+            budget_eur: 3000000.0
+          })
+        });
+        const data = await resp.json();
+        alert(`🚨 Proactive Emergency Triggered!\nTop candidate found: ${data.top_candidate}\nStaged proposed scouting action into HITL Queue.`);
+        loadHitlActions();
+      } catch (err) {
+        alert("Injury trigger error: " + err);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Fire Injury Event (Getafe CF LB)';
+        btn.disabled = false;
+      }
+    }
+
+    async function triggerExpiryScan() {
+      const btn = document.getElementById('expiryBtn');
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/proactive/scan-expirations', { method: 'POST' });
+        const data = await resp.json();
+        alert(`⚡ Proactive Scan Complete: Identified ${data.scanned_deals_count} expiring contract opportunities and staged them into HITL Queue.`);
+        loadHitlActions();
+      } catch (err) {
+        alert("Expiry scan error: " + err);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-radar"></i> Run Autonomous Expiry Scan';
+        btn.disabled = false;
+      }
+    }
+
+    async function loadHitlActions() {
+      const container = document.getElementById('hitlActionsList');
+      try {
+        const resp = await fetch('/api/hitl/actions');
+        const actions = await resp.json();
+        loadPendingCount(actions);
+
+        if (!actions.length) {
+          container.innerHTML = '<div class="text-center py-8 text-slate-500 text-xs">No actions in queue. Trigger a recruitment solve or proactive event.</div>';
+          return;
+        }
+
+        container.innerHTML = actions.map(a => `
+          <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center space-x-2">
+                <span class="font-mono text-xs font-bold text-emerald-400">${a.action_id}</span>
+                <span class="badge badge-xs badge-neutral border-slate-700 text-slate-300 font-mono">${a.action_type}</span>
+                ${a.is_irreversible ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-950/80 text-rose-300 border border-rose-500/40"><i class="fa-solid fa-lock text-[9px]"></i> Irreversible</span>' : ''}
+              </div>
+              <div>
+                ${a.status === 'PENDING' ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400 text-slate-950">PENDING</span>' : (a.status === 'APPROVED' ? '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-400 text-slate-950">APPROVED</span>' : '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-800 text-slate-300">REJECTED</span>')}
+              </div>
+            </div>
+
+            <div class="text-sm font-semibold text-white">${a.summary}</div>
+            
+            <div class="text-xs text-slate-400 flex flex-wrap gap-4 font-mono">
+              <span>Target: <strong class="text-slate-200">${a.player_name} (${a.target_club})</strong></span>
+              <span>Cost: <strong class="text-slate-200">€${Number(a.estimated_cost_eur).toLocaleString()}</strong></span>
+              <span>Impact: <strong class="text-slate-200">${a.impact_level}</strong></span>
+              ${a.reviewed_at ? `<span>Reviewed: <strong>${a.reviewed_at.slice(0, 16)}</strong></span>` : ''}
+            </div>
+
+            ${a.execution_result ? `
+              <div class="text-xs bg-slate-900 border border-emerald-500/20 text-emerald-300 p-2.5 rounded-lg font-mono">
+                ${a.execution_result}
+              </div>
+            ` : ''}
+
+            ${a.status === 'PENDING' ? `
+              <div class="flex items-center gap-2 pt-2 border-t border-slate-800/80">
+                <button onclick="reviewAction('${a.action_id}', 'APPROVE')" class="btn btn-xs btn-success bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold border-none">
+                  <i class="fa-solid fa-check"></i> Approve
+                </button>
+                <button onclick="reviewAction('${a.action_id}', 'EDIT')" class="btn btn-xs btn-outline border-slate-700 text-slate-200">
+                  <i class="fa-solid fa-pen"></i> Edit & Approve
+                </button>
+                <button onclick="reviewAction('${a.action_id}', 'REJECT')" class="btn btn-xs btn-error bg-red-600 hover:bg-red-500 text-white font-bold border-none">
+                  <i class="fa-solid fa-xmark"></i> Reject
+                </button>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = '<div class="text-center py-4 text-red-400 text-xs">Error loading actions</div>';
+      }
+    }
+
+    async function reviewAction(actionId, decision) {
+      let notes = prompt(`Enter reviewer notes for ${decision} (optional):`, "");
+      if (notes === null) return;
+
+      try {
+        const resp = await fetch(`/api/hitl/actions/${actionId}/review`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            decision: decision,
+            reviewer_notes: notes || "Review completed by Sporting Director."
+          })
+        });
+        const updated = await resp.json();
+        loadHitlActions();
+      } catch (err) {
+        alert("Review failed: " + err);
+      }
+    }
+
+    async function loadPendingCount(actions) {
+      if (!actions) {
+        const r = await fetch('/api/hitl/actions');
+        actions = await r.json();
+      }
+      const pending = actions.filter(a => a.status === 'PENDING').length;
+      document.getElementById('pendingActionCount').innerText = pending;
+    }
+
+    async function loadObservability() {
+      try {
+        const [mResp, tResp] = await fetch('/api/observability/metrics').then(r => r.json()).then(async m => [m, await fetch('/api/observability/traces').then(r => r.json())]);
+        
+        document.getElementById('obsTotalRuns').innerText = mResp.total_runs;
+        document.getElementById('obsPromptTokens').innerText = Number(mResp.total_prompt_tokens).toLocaleString();
+        document.getElementById('obsTotalCost').innerText = `$${Number(mResp.total_cost_usd).toFixed(4)}`;
+        document.getElementById('obsAvgLatency').innerText = `${mResp.avg_latency_ms} ms`;
+
+        const tbody = document.getElementById('obsTableBody');
+        tbody.innerHTML = tResp.map(t => `
+          <tr class="hover:bg-slate-800/40">
+            <td class="font-mono text-sky-400 font-bold">${t.run_id}</td>
+            <td class="text-slate-400">${t.timestamp.slice(11, 19)}</td>
+            <td><span class="badge badge-xs badge-neutral border-slate-700 font-mono">${t.trigger_type}</span></td>
+            <td class="max-w-xs truncate text-slate-200" title="${t.query}">${t.query}</td>
+            <td class="font-mono text-slate-300">${t.execution_time_ms} ms</td>
+            <td class="font-mono text-emerald-400">$${t.estimated_cost_usd.toFixed(5)}</td>
+            <td><span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">${t.status}</span></td>
+            <td class="font-mono text-[11px] text-slate-400">${t.tool_calls.map(tc => tc.tool_name).join(' &rarr; ')}</td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        console.error("Observability error:", err);
+      }
+    }
+
+    // Live Player Database Explorer Logic
+    let explorerPage = 1;
+    let explorerTotalPages = 1;
+
+    async function searchPlayers(page = 1) {
+      explorerPage = page;
+      const q = document.getElementById('playerSearchInput')?.value.trim() || '';
+      const pos = document.getElementById('playerPositionFilter')?.value || 'ALL';
+      const tbody = document.getElementById('playerExplorerTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading verified player records...</td></tr>';
+
+      try {
+        const url = `/api/data/players?page=${page}&page_size=15&search=${encodeURIComponent(q)}&position=${encodeURIComponent(pos)}`;
+        const resp = await fetch(url);
+        if (!resp.ok) {
+          throw new Error(`Server returned HTTP ${resp.status}`);
+        }
+        const data = await resp.json();
+        const playersList = data.players || [];
+        explorerTotalPages = data.total_pages || 1;
+
+        const countInfo = document.getElementById('explorerCountInfo');
+        if (countInfo) {
+          countInfo.innerText = `Showing ${playersList.length ? ((page-1)*15 + 1) : 0}-${Math.min(page*15, data.total || 0)} of ${Number(data.total || 0).toLocaleString()} verified professional players`;
+        }
+        const pageInd = document.getElementById('explorerPageIndicator');
+        if (pageInd) pageInd.innerText = `Page ${page} of ${explorerTotalPages}`;
+        const prevBtn = document.getElementById('prevExplorerBtn');
+        if (prevBtn) prevBtn.disabled = (page <= 1);
+        const nextBtn = document.getElementById('nextExplorerBtn');
+        if (nextBtn) nextBtn.disabled = (page >= explorerTotalPages);
+
+        if (!playersList.length) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center py-6 text-slate-500">No players match your search filter.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = playersList.map(p => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="font-bold text-white">${p.name}</td>
+            <td>${p.age || '-'}y</td>
+            <td class="text-slate-300">${p.current_club_name || 'Free Agent'}</td>
+            <td><span class="badge badge-xs badge-neutral border-slate-700 font-mono">${p.current_club_domestic_competition_id || '-'}</span></td>
+            <td><span class="text-slate-400">${p.sub_position || p.position || '-'}</span></td>
+            <td class="font-mono font-bold text-emerald-400">€${Number(p.market_value_in_eur || 0).toLocaleString()}</td>
+            <td class="font-mono text-slate-400">€${Number(p.highest_market_value_in_eur || 0).toLocaleString()}</td>
+            <td class="font-mono text-slate-400 text-[11px]">${p.contract_expiration_date ? p.contract_expiration_date.slice(0, 10) : 'N/A'}</td>
+            <td>
+              <a href="${p.url}" target="_blank" class="text-emerald-400 hover:text-emerald-300 underline flex items-center gap-1">
+                <span>Transfermarkt</span> <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+              </a>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-red-400">Error loading players: ${err}</td></tr>`;
+      }
+    }
+
+    function prevExplorerPage() {
+      if (explorerPage > 1) searchPlayers(explorerPage - 1);
+    }
+
+    function nextExplorerPage() {
+      if (explorerPage < explorerTotalPages) searchPlayers(explorerPage + 1);
+    }
+
+    // Auto-execute default solve on load
+    window.addEventListener('DOMContentLoaded', () => {
+      executeSolve();
+      loadPendingCount();
+      executeBacktest();
+    });
+  </script>
+</body>
+</html>

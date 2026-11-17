@@ -167,7 +167,7 @@ class MathematicalOptimizationSolver:
 
         # Step 7: Build CandidateResult objects with data citations & rationale
         candidate_results = []
-        for rank, cand in enumerate(topsis_results[:10], start=1):
+        for rank, cand in enumerate(topsis_results[:50], start=1):
             val_eur = float(cand.get("market_value_in_eur") or 0.0)
             rationale = self._generate_decision_rationale(cand, spec, rank)
 

@@ -30,7 +30,7 @@ class BacktestEngine:
         position: str = "Left-Back",
         budget: float = 3_000_000.0,
         max_age: Optional[int] = None,
-        top_k: int = 5
+        top_k: int = 10
     ) -> BacktestReport:
         cutoff_date = self.SEASON_CUTOFFS.get(historical_season, "2022-07-01")
 

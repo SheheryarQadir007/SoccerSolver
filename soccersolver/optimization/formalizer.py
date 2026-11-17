@@ -301,17 +301,22 @@ class ProblemFormalizer:
         weights: ObjectiveWeights,
         ref_player: Optional[str]
     ) -> str:
-        age_clause = f"\\text{{Age}}(x) &\\le {max_age} \\\\\n" if max_age else ""
-        pos_display = ", ".join(allowed_subs) if allowed_subs else position
+        pos_display = ", ".join(f"\\text{{{s}}}" for s in allowed_subs) if allowed_subs else f"\\text{{{position}}}"
         ref_clause = f" + {weights.profile_similarity:.2f} \\cdot \\text{{Similarity}}(x, \\mathbf{{v}}_{{\\text{{{ref_player}}}}})" if ref_player else ""
+
+        c_lines = [f"\\text{{Cost}}(x) \\le {budget:,.0f} \\text{{ EUR}}"]
+        if max_age:
+            c_lines.append(f"\\text{{Age}}(x) \\le {max_age}")
+        c_lines.append(f"\\text{{Position}}(x) \\in \\{{{pos_display}\\}}")
+        c_lines.append(f"\\text{{MinutesPlayed}}(x) \\ge {min_minutes}")
+
+        constraints_str = " \\\\\n".join(f"&{c}" for c in c_lines)
 
         return f"""
 \\begin{{aligned}}
 \\max_{{x \\in \\mathcal{{P}}}} \\quad \\Phi(x) &= {weights.tactical_fit:.2f} \\cdot S_{{\\text{{tactical}}}}(x, \\text{{{league_code}}}) + {weights.expected_growth_xtv:.2f} \\cdot \\Delta \\text{{xTV}}(x) \\\\
 &\\quad + {weights.value_efficiency:.2f} \\cdot \\frac{{S_{{\\text{{tactical}}}}(x)}}{{\\text{{Cost}}(x)}} + {weights.age_potential:.2f} \\cdot \\Psi_{{\\text{{age}}}}(x){ref_clause} - {weights.financial_risk_penalty:.2f} \\cdot \\Lambda(x) \\\\[6pt]
 \\text{{subject to:}} \\quad
-&\\text{{Cost}}(x) \\le {budget:,.0f} \\text{{ EUR}} \\\\
-&{age_clause}&\\text{{Position}}(x) \\in \\{{{pos_display}\\}} \\\\
-&\\text{{MinutesPlayed}}(x) \\ge {min_minutes}
+{constraints_str}
 \\end{{aligned}}
 """.strip()

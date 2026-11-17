@@ -346,3 +346,61 @@ class FootballDataRepository:
                 "subsequent_club": transfer_row["to_club_name"] if transfer_row else None,
                 "data_source": "Verified Transfermarkt historical valuation trajectory"
             }
+
+    def search_players_paginated(
+        self,
+        search: Optional[str] = None,
+        position: Optional[str] = None,
+        league: Optional[str] = None,
+        min_market_value: Optional[float] = None,
+        max_market_value: Optional[float] = None,
+        offset: int = 0,
+        limit: int = 20
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            conditions = ["1=1"]
+            params: List[Any] = []
+
+            if search and search.strip():
+                term = f"%{search.strip().lower()}%"
+                conditions.append("(LOWER(p.name) LIKE ? OR LOWER(p.current_club_name) LIKE ?)")
+                params.extend([term, term])
+
+            if position and position != "ALL":
+                conditions.append("(p.position = ? OR p.sub_position = ?)")
+                params.extend([position, position])
+
+            if league and league != "ALL":
+                conditions.append("p.current_club_domestic_competition_id = ?")
+                params.append(league)
+
+            if min_market_value is not None:
+                conditions.append("p.market_value_in_eur >= ?")
+                params.append(min_market_value)
+
+            if max_market_value is not None:
+                conditions.append("p.market_value_in_eur <= ?")
+                params.append(max_market_value)
+
+            where_clause = " AND ".join(conditions)
+
+            # Count total
+            count_query = f"SELECT COUNT(*) FROM players p WHERE {where_clause}"
+            cur.execute(count_query, params)
+            total = cur.fetchone()[0]
+
+            # Fetch paginated rows
+            data_query = f"""
+                SELECT p.player_id, p.name, p.age, p.position, p.sub_position,
+                       p.current_club_name, p.current_club_domestic_competition_id,
+                       p.market_value_in_eur, p.highest_market_value_in_eur,
+                       p.contract_expiration_date, p.url, p.data_citation
+                FROM players p
+                WHERE {where_clause}
+                ORDER BY p.market_value_in_eur DESC, p.name ASC
+                LIMIT ? OFFSET ?
+            """
+            cur.execute(data_query, params + [limit, offset])
+            rows = [dict(r) for r in cur.fetchall()]
+            return rows, total
